@@ -13,9 +13,9 @@ namespace Rendering
     /// <summary>
     /// Perlin noise class able to generate noise in 3D space
     /// </summary>
-    public class PerlinNoise
+    public class PerlinNoiseMatejka
     {
-      public PerlinNoise (int seed = 1337)
+      public PerlinNoiseMatejka (int seed = 1337)
       {
         rand = new Random(seed);
         ShufflePermutation();

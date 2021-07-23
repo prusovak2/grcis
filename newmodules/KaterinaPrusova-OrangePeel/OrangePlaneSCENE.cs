@@ -33,7 +33,7 @@ Sphere s = new Sphere();
 root.InsertChild(s, Matrix4d.Identity);
 //s.SetAttribute(PropertyName.MATERIAL, new PhongMaterial(new double[] { 1.0, 0.8, 0.1 }, 0.3, 0.1, 0.01, 5));
 s.SetAttribute(PropertyName.TEXTURE, new OrangePeelBumpTexture());
-s.SetAttribute(PropertyName.MATERIAL, new PhongMaterial(new double[] {1.0, 0.6, 0.1}, 0.1, 0.6, 0.01, 16));
+s.SetAttribute(PropertyName.MATERIAL, new PhongMaterial(new double[] { 1.0, 0, 0 }, 0.2, 0.5, 0.05, 16));
 // Infinite plane with checker.
 Plane pl = new Plane();
 pl.SetAttribute(PropertyName.COLOR, new double[] {0.5, 0.0, 0.0});

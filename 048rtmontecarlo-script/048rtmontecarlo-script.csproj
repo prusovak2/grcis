@@ -264,6 +264,12 @@
     <Compile Include="..\common\WorkloadDistribution.cs">
       <Link>WorkloadDistribution.cs</Link>
     </Compile>
+    <Compile Include="..\newmodules\JanMatejka-Wooden3DTexture\PerlinNoiseMatejka.cs">
+      <Link>PerlinNoiseMatejka.cs</Link>
+    </Compile>
+    <Compile Include="..\newmodules\KaterinaPrusova-OrangePeel\OrangePeelBumpTexture.cs">
+      <Link>OrangePeelBumpTexture.cs</Link>
+    </Compile>
     <Compile Include="AdditionalViewsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -276,6 +282,10 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GradientWrapper.cs" />
+    <Compile Include="INoise.cs" />
+    <Compile Include="INoiseWithGradient.cs" />
+    <Compile Include="PerlinNoise.cs" />
     <Compile Include="RayVisualizerForm.cs">
       <SubType>Form</SubType>
     </Compile>
