@@ -26,6 +26,7 @@ namespace Rendering
       private double Freq; // 4 to 14, best 8
       private double Ampl;  // 0.001 to 0.006 best 0.004
       private double Struc; // 0.4 to 1.4 best 1.4
+      private double Color; // -0.005 to 0.006 best 0
       
       private static readonly Vector3d Red = new Vector3d(230, 0, 0);
       private static readonly Vector3d Orange = new Vector3d(255, 51, 0);
@@ -34,12 +35,13 @@ namespace Rendering
       private Vector3d OrangeToRed => Orange - Red;
       private Vector3d OrangeToLightOrange => LightOrange -Red;
 
-      public OrangePeelBumpTexture(double freq = 0.4, double amplitude =  0.6, double struc = 1, int seed = 73)
+      public OrangePeelBumpTexture (double freq = 0.4, double amplitude = 0.6, double struc = 1, double color = 0.2, int seed = 73)
       {
         this.PerlinNoise = new PerlinNew(seed);
         this.Freq = Scale(freq, 4, 14);
         this.Ampl = Scale(amplitude, 0.001, 0.006);
         this.Struc = Scale(struc, 0.4, 1.4);
+        this.Color = Scale(color, -0.005, 0.006);
       }
 
       public long Apply (Intersection inter)
@@ -50,7 +52,7 @@ namespace Rendering
 
       private double Scale(double toScale, double lower, double upper)
       {
-        double intervalLenght = upper - lower;
+        double intervalLenght = Math.Abs(upper - lower);
         return (toScale * intervalLenght) + lower;
       }
 
@@ -104,7 +106,7 @@ namespace Rendering
         double coef = 160;
         double noise = NoiseWithFrequency(inter.CoordLocal.X, inter.CoordLocal.Y, inter.CoordLocal.Z, 14, 0.004, 1.4);
         noise += add;
-        if (noise >= 0)
+        if (noise >= this.Color)
         {
           inter.SurfaceColor = (Red + noise * coef * OrangeToRed).ToRGB();
         }
