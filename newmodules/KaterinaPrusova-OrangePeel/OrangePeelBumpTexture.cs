@@ -4,9 +4,6 @@ using System.Diagnostics;
 using MathSupport;
 using OpenTK;
 using Utilities;
-using Rendering;
-using Rendering.JanMatejka;
-using VojtechCerny;
 
 namespace Rendering
 {
@@ -22,7 +19,7 @@ namespace Rendering
 
     public class OrangePeelBumpTexture : ITexture
     {
-      private PerlinNew PerlinNoise = new PerlinNew();
+      private Perlin PerlinNoise = new Perlin();
       private double Freq; // 4 to 14, best 8
       private double Ampl;  // 0.001 to 0.006 best 0.004
       private double Struc; // 0.4 to 1.4 best 1.4
@@ -37,7 +34,7 @@ namespace Rendering
 
       public OrangePeelBumpTexture (double freq = 0.4, double amplitude = 0.6, double struc = 1, double color = 0.2, int seed = 73)
       {
-        this.PerlinNoise = new PerlinNew(seed);
+        this.PerlinNoise = new Perlin(seed);
         this.Freq = Scale(freq, 4, 14);
         this.Ampl = Scale(amplitude, 0.001, 0.006);
         this.Struc = Scale(struc, 0.4, 1.4);
@@ -46,6 +43,7 @@ namespace Rendering
 
       public long Apply (Intersection inter)
       {
+        inter.Material = new PhongMaterial(Orange.ToRGB(), 0.2, 0.5, 0.0492, 16);
         MakeColor(inter);
         return MakeBumps(inter);
       }
@@ -147,11 +145,11 @@ namespace Rendering
       /// Implementation of Perlin improved noise function https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch05.html
       /// Taken from here https://gist.github.com/Flafla2/1a0b9ebef678bbce3215 and slightly adjusted
       /// </summary>
-      public class PerlinNew
+      public class Perlin
       {
         private Random random;
 
-        public PerlinNew (int seed = 73)
+        public Perlin (int seed = 73)
         {
           this.random = new Random(seed);
           Shuffle(this.permutation);
