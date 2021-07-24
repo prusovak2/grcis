@@ -12,33 +12,46 @@ namespace Rendering
 {
   namespace KaterinaPrusova
   {
+    public static class Vector3DExtensions
+    {
+      public static double[] ToRGB (this Vector3d vector)
+      {
+        return new double[] { vector.X / 255f, vector.Y / 255f, vector.Z / 255f };
+      }
+    }
+
     public class OrangePeelBumpTexture : ITexture
     {
-
       private PerlinNew PerlinNoise = new PerlinNew();
-      private double Freq; // 4 to 14, best 9
+      private double Freq; // 4 to 14, best 8
       private double Ampl;  // 0.001 to 0.006 best 0.004
-      private double Struc; // 0.4 to 1.2 best 0.8
+      private double Struc; // 0.4 to 1.4 best 1.4
+      
+      private static readonly Vector3d Red = new Vector3d(230, 0, 0);
+      private static readonly Vector3d Orange = new Vector3d(255, 51, 0);
+      private static readonly Vector3d LightOrange = new Vector3d(255, 128, 0);
 
-      private Vector3d StartColor = new Vector3d(1d, 200/255d, 0);
-      private Vector3d EndColor = new Vector3d(204/255d, 0, 0);
-      private Vector3d Diff => EndColor - StartColor;
+      private Vector3d OrangeToRed => Orange - Red;
+      private Vector3d OrangeToLightOrange => LightOrange -Red;
 
-      public OrangePeelBumpTexture(int seed = 73, double freq = 8, double amplitude =  0.006, double struc = 1.4)
+      public OrangePeelBumpTexture(double freq = 0.4, double amplitude =  0.6, double struc = 1, int seed = 73)
       {
         this.PerlinNoise = new PerlinNew(seed);
-        this.Freq = freq;
-        this.Ampl = amplitude;
-        this.Struc = struc;
+        this.Freq = Scale(freq, 4, 14);
+        this.Ampl = Scale(amplitude, 0.001, 0.006);
+        this.Struc = Scale(struc, 0.4, 1.4);
       }
 
       public long Apply (Intersection inter)
       {
-
-        inter.SurfaceColor = new double[] { 1.0, 0.45, 0 };
-
-
+        MakeColor(inter);
         return MakeBumps(inter);
+      }
+
+      private double Scale(double toScale, double lower, double upper)
+      {
+        double intervalLenght = upper - lower;
+        return (toScale * intervalLenght) + lower;
       }
 
       /// <summary>
@@ -59,10 +72,10 @@ namespace Rendering
 
         // approximate the gradient of the noise function at [x, y, z]
         double epsilon = 0.00000000001;
-        double f0 = NoiseWithFrequency(normal[0], normal[1], normal[2], this.Freq);
-        double fx = NoiseWithFrequency(normal[0]+epsilon, normal[1], normal[2], this.Freq);
-        double fy = NoiseWithFrequency(normal[0], normal[1]+epsilon, normal[2], this.Freq);
-        double fz = NoiseWithFrequency(normal[0], normal[1], normal[2]+ epsilon, this.Freq);
+        double f0 = NoiseWithFrequency(normal[0], normal[1], normal[2], this.Freq, this.Ampl, this.Struc);
+        double fx = NoiseWithFrequency(normal[0]+epsilon, normal[1], normal[2], this.Freq, this.Ampl, this.Struc);
+        double fy = NoiseWithFrequency(normal[0], normal[1]+epsilon, normal[2], this.Freq, this.Ampl, this.Struc);
+        double fz = NoiseWithFrequency(normal[0], normal[1], normal[2]+ epsilon, this.Freq, this.Ampl, this.Struc);
 
         double gradX = (fx - f0) / epsilon;
         double gradY = (fy - f0) / epsilon;
@@ -85,6 +98,22 @@ namespace Rendering
         return (long)RandomStatic.numericRecipes((ulong)(f0 * 1000000));
       }
 
+      private void MakeColor(Intersection inter)
+      {
+        double add = 0.0001;
+        double coef = 160;
+        double noise = NoiseWithFrequency(inter.CoordLocal.X, inter.CoordLocal.Y, inter.CoordLocal.Z, 14, 0.004, 1.4);
+        noise += add;
+        if (noise >= 0)
+        {
+          inter.SurfaceColor = (Red + noise * coef * OrangeToRed).ToRGB();
+        }
+        else
+        {
+          inter.SurfaceColor = (Red + noise * coef * OrangeToLightOrange).ToRGB();
+        }
+      }
+
       /// <summary>
       /// Allows to influence the frequency of the noise 
       /// </summary>
@@ -93,15 +122,15 @@ namespace Rendering
       /// <param name="z"></param>
       /// <param name="freq"></param>
       /// <returns></returns>
-      private double NoiseWithFrequency(double x, double y, double z, double freq)
+      private double NoiseWithFrequency(double x, double y, double z, double freq, double ampl, double str)
       {
-        double d = this.Struc;
+        double d = str;
         double x1, y1, z1;
         x1 = d * x - d * z;
         z1 = d * x + d * z;
         y1 = d * x1 + d * y;
         x1 = d * x1 - d * y;
-        return this.Ampl * PerlinNoise.OctavePerlin(freq * x1 + 100, freq * y1, freq * z1, 2, 2.5);
+        return ampl * PerlinNoise.OctavePerlin(freq * x1 + 100, freq * y1, freq * z1, 2, 2.5);
       }
 
       private static void Normalize (double[] v)
