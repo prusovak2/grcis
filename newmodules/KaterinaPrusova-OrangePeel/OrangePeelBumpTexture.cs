@@ -11,12 +11,22 @@ namespace Rendering
   {
     public static class Vector3DExtensions
     {
+      /// <summary>
+      /// Converts vector to the array of 3 doubles, divides every value by 255 to
+      /// convert values from [0, 255] to [0,1]
+      /// </summary>
+      /// <param name="vector"></param>
+      /// <returns></returns>
       public static double[] ToRGB (this Vector3d vector)
       {
         return new double[] { vector.X / 255f, vector.Y / 255f, vector.Z / 255f };
       }
     }
 
+    /// <summary>
+    /// Texture resembling an orange peel
+    /// to be used with the spheres only!
+    /// </summary>
     public class OrangePeelBumpTexture : ITexture
     {
       private Perlin PerlinNoise = new Perlin();
@@ -32,9 +42,25 @@ namespace Rendering
       private Vector3d OrangeToRed => Orange - Red;
       private Vector3d OrangeToLightOrange => LightOrange -Red;
 
+      /// <summary>
+      /// Orange peel bump texture, modifies normal, color and material
+      /// <paramref name="freq"/>, <paramref name="amplitude"/>, <paramref name="struc"/> and <paramref name="color"/> must belong to [0,1] interval!
+      /// </summary>
+      /// <param name="freq">frequency of bumps</param>
+      /// <param name="amplitude">amplitude of bumps</param>
+      /// <param name="struc">influences the overall appearance of the orange</param>
+      /// <param name="color">shade of the peel, 0... orange/red, 1... orange/yellow</param>
+      /// <param name="seed"></param>
       public OrangePeelBumpTexture (double freq = 0.4, double amplitude = 0.6, double struc = 1, double color = 0.2, int seed = 73)
       {
         this.PerlinNoise = new Perlin(seed);
+        // if param value is greater than 1 use 1 instead, it it is lower than 0, use 0
+        AdjustParam(ref freq);  
+        AdjustParam(ref amplitude);
+        AdjustParam(ref struc);
+        AdjustParam(ref color);
+        // To make the texture easier to use, params are passed as values from [0,1] intervals
+        // it is necessary to scale the params, so that they can be used to create the texture
         this.Freq = Scale(freq, 4, 14);
         this.Ampl = Scale(amplitude, 0.001, 0.006);
         this.Struc = Scale(struc, 0.4, 1.4);
@@ -48,6 +74,26 @@ namespace Rendering
         return MakeBumps(inter);
       }
 
+      /// <summary>
+      /// Ctor params should be from [0,1] interval, other values get replaced by 0 or 1 
+      /// </summary>
+      /// <param name="param"></param>
+      private void AdjustParam(ref double param)
+      {
+        if(param > 1)
+        {
+          param = 1;
+        }
+        if(param < 0)
+        {
+          param = 0;
+        }
+      }
+
+      /// <summary>
+      /// scale value from interval [0,1] to [lower, upper]
+      /// </summary>
+      /// <returns></returns>
       private double Scale(double toScale, double lower, double upper)
       {
         double intervalLenght = Math.Abs(upper - lower);
@@ -97,7 +143,10 @@ namespace Rendering
         inter.textureApplied = true;
         return (long)RandomStatic.numericRecipes((ulong)(f0 * 1000000));
       }
-
+      /// <summary>
+      /// Modifies the color of the orange, uses Perlin noise to create small red and light orange dots that appear on orange peel 
+      /// </summary>
+      /// <param name="inter"></param>
       private void MakeColor(Intersection inter)
       {
         double add = 0.0001;
@@ -117,10 +166,6 @@ namespace Rendering
       /// <summary>
       /// Allows to influence the frequency of the noise 
       /// </summary>
-      /// <param name="x"></param>
-      /// <param name="y"></param>
-      /// <param name="z"></param>
-      /// <param name="freq"></param>
       /// <returns></returns>
       private double NoiseWithFrequency(double x, double y, double z, double freq, double ampl, double str)
       {
@@ -132,7 +177,6 @@ namespace Rendering
         x1 = d * x1 - d * y;
         return ampl * PerlinNoise.OctavePerlin(freq * x1 + 100, freq * y1, freq * z1, 2, 2.5);
       }
-
       private static void Normalize (double[] v)
       {
         double norm = Math.Sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
