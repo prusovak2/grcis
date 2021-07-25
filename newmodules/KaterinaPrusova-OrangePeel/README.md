@@ -58,7 +58,52 @@ Normal vector are perturbed by subtracting the gradient of the noise function. T
 Default parameters:
 
 * `freq` = 0.4 
+
 * `amplitude `= 0.6
+
 * `struc` = 1
+
 * `color` = 0.2
+
+  ![DeafultParams](https://github.com/prusovak2/grcis/blob/master/newmodules/KaterinaPrusova-OrangePeel/Images/DefaultParams.png)
+
+* `freq` = 0.4 
+
+* `amplitude `= 0.6
+
+* `struc` = 1
+
+* `color` = 1
+
+  ![](https://github.com/prusovak2/grcis/blob/master/newmodules/KaterinaPrusova-OrangePeel/Images/Defaul_col1.png)
+
+* `freq` = 0.8
+
+* `amplitude `= 0.3
+
+* `struc` = 0.4
+
+* `color` = 1
+
+  ![](https://github.com/prusovak2/grcis/blob/master/newmodules/KaterinaPrusova-OrangePeel/Images/0.8_0.3_0.4_1.png)
+
+* `freq` = 0.4
+
+* `amplitude `= 0.7
+
+* `struc` = 0.5
+
+* `color` = 0
+
+  ![](https://github.com/prusovak2/grcis/blob/master/newmodules/KaterinaPrusova-OrangePeel/Images/0.4_0.7_0.5.png)
+
+* `freq` = 0.2
+
+* `amplitude `= 0.7
+
+* `struc` = 0.4
+
+* `color` = 0.7
+
+  ![](https://github.com/prusovak2/grcis/blob/master/newmodules/KaterinaPrusova-OrangePeel/Images/0.2_0.7_0.4_0.7.png)
 
